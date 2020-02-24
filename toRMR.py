@@ -3,7 +3,6 @@ import numpy as np
 import time
 
 def run() :
-    pd.set_option('display.max_columns', 500)
     df = pd.read_csv("tmbExport.csv")
     print('CSV retrieved.')
     df1 = df.sort_values(['siteid'])
@@ -18,7 +17,7 @@ def run() :
     dfFinal = pd.DataFrame(columns = targetColumns)
     print('Structured intermediary target dataframe')
     print('Structured final dataframe')
-    utilityEnv = ['Barrington', 'Carson City', 'Cedar Falls', 'Elk Grove', 'Johnstown', 'Kewanee', 'Lawrence', 'Marion', 'Mill Creek', 'New Braunfels', 'Owensboro', 'Prosser', 'Richton Park', 'Signal Hill']
+    utilityEnv = ['Barrington', 'Carson City', 'Cedar Falls', 'Elk Grove', 'Johnstown', 'Kewanee', 'Lawrence', 'Marion Utilities', 'Mill Creek', 'New Braunfels', 'Owensboro', 'Prosser', 'Richton Park', 'Signal Hill']
     print('Got list of cities that supply their own envelopes')
 
     dfSendSite = df1[df1['sendnotices']]
@@ -104,13 +103,10 @@ def run() :
             dfFinal.at[i, 'billing'] = 'Archon'
         else :
             dfFinal.at[i, 'billing'] = 'ABF'
-    for i in utilityEnv :
-        for j in dfFinal.index :
-            if i in dfFinal.at[j, 'utility'] :
-                dfFinal.at[j, 'envelope'] = dfFinal.at[j, 'utility']
-                print ('Applying envelopes for ' + dfFinal.at[j, 'utility'])
-            else :
-                dfFinal.at[j, 'envelope'] = 'ABF'
+    dfFinal['envelope'] = 'ABF'
+    for i in dfFinal[dfFinal['utility'].str.contains('|'.join(utilityEnv))].index :
+        print('Setting envelope for ' + str(dfFinal.at[i, 'utility']))
+        dfFinal.at[i, 'envelope'] = dfFinal.at[i, 'utility']
     print('Set billing to ABF or Archon')
     print('Saving file...')
     dfFinal.to_excel('output.xlsx')
