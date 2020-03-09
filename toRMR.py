@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import time
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 def run() :
     df = pd.read_csv("tmbExport.csv")
@@ -17,8 +19,10 @@ def run() :
     dfFinal = pd.DataFrame(columns = targetColumns)
     print('Structured intermediary target dataframe')
     print('Structured final dataframe')
-    utilityEnv = ['Barrington', 'Carson City', 'Cedar Falls', 'Elk Grove', 'Johnstown', 'Kewanee', 'Lawrence', 'Marion Utilities', 'Mill Creek', 'New Braunfels', 'Owensboro', 'Prosser', 'Richton Park', 'Signal Hill']
+    utilityEnv = ['Archon', 'Barrington', 'Carson City', 'Cedar Falls', 'Elk Grove', 'Johnstown', 'Kewanee', 'Lawrence', 'Marion Utilities', 'Mill Creek', 'New Braunfels', 'Owensboro', 'Prosser', 'Richton Park', 'Signal Hill']
     print('Got list of cities that supply their own envelopes')
+    userCheck = []
+    userCheckSIDs = []
 
     dfSendSite = df1[df1['sendnotices']]
     for i in dfSendSite.index :
@@ -108,6 +112,12 @@ def run() :
         print('Setting envelope for ' + str(dfFinal.at[i, 'utility']))
         dfFinal.at[i, 'envelope'] = dfFinal.at[i, 'utility']
     print('Set billing to ABF or Archon')
+    print('Deleting non-real utilities')
+    dfFinal = dfFinal[~dfFinal.utility.str.contains("Sample")]
+    dfFinal = dfFinal[~dfFinal.utility.str.contains("Demo")]
+    dfFinal = dfFinal[~dfFinal.utility.str.contains("NOT UTILITY")]
+    dfFinal.sort_values(['sId'], inplace=True)
+    dfFinal.reset_index(drop=True, inplace=True)
     print('Saving file...')
     dfFinal.to_excel('output.xlsx')
     print(' ')
@@ -116,11 +126,35 @@ def run() :
     print(' ')
     print(' ')
     print(' ')
-    print('Done! Your new file is named \'output.xlsx\'')
+    dfOnlyDups = dfFinal[dfFinal.duplicated(subset = 'sId', keep = False)]
+    for i in dfOnlyDups.index :
+        maskSID = dfOnlyDups['sId'] == dfOnlyDups.at[i, 'sId']
+        dfTrimmed = dfOnlyDups[maskSID]
+        for j in dfTrimmed.index :
+            for x in dfTrimmed.index :
+                if (j == x) :
+                    continue
+                if (fuzz.ratio(dfTrimmed.at[j, 'mAddress'].lower(), dfTrimmed.at[x, 'mAddress'].lower()) > 60) :
+                    if (fuzz.ratio(dfTrimmed.at[j, 'mCity'].lower(), dfTrimmed.at[x, 'mCity'].lower()) < 90) :
+                        continue
+                    elif not (dfTrimmed.at[j, 'sId'] in userCheckSIDs) :
+                        userCheckSIDs.append(dfTrimmed.at[j, 'sId'])
+                        userCheck.append({'sId':dfTrimmed.at[j, 'sId'], 'm1':dfTrimmed.at[j, 'mAddress'], 'm2':dfTrimmed.at[x, 'mAddress'], 'mC1':dfTrimmed.at[j, 'mCompany'], 'mC2':dfTrimmed.at[x, 'mCompany']})
+                    x += 1
+                x += 1
+    dash = '-' * 100
+    print('\n\n\n' + dash)
+    print('Done!\nYour new file is named \'output.xlsx\' \nThese addresses looked similar')
+    print(dash)
+    print('\n\n')
+    print('{:<10}{:<50}{:>40}'.format('Site ID', 'Mailing Addresses', 'Mailing Company')+'\n')
+    for item in userCheck :
+        print('{:<10}{:<50}{:>40}'.format(item['sId'], item['m1'], item['mC1']))
+        print('{:<10}{:<50}{:>40}'.format('', item['m2'], item['mC2'])+'\n')
     print(' ')
     print(' ')
     print(' ')
-    print('Have a WONDERFUL day!')
+    print('Check these ^ sites for potential duplicate mailing addresses\nHave a WONDERFUL day!')
 
 print(' ')
 print(' ')
