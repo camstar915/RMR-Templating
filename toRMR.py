@@ -64,24 +64,24 @@ def run() :
             mask1 = df1['siteid'] == df1.at[i, 'siteid']
             mask2 = df1['sendnotices.1']
             dfTemp = df1[mask1 & mask2]
-            for i in dfTemp.index :
-                if (dfTemp.at[i, 'address.1'] in dfFinal['mAddress'].values) :
+            for j in dfTemp.index :
+                if (dfTemp.at[j, 'address.1'] in dfFinal[dfFinal['sId'] == dfTemp.at[j, 'siteid']]['mAddress'].values) :
                     continue
                 else :
-                    dfTarget.at[0, 'utility'] = dfTemp.at[i, 'municipality']
-                    dfTarget.at[0, 'sId'] = dfTemp.at[i, 'siteid']
-                    dfTarget.at[0, 'sCompany'] = dfTemp.at[i, 'company']
-                    dfTarget.at[0, 'sAddress'] = dfTemp.at[i, 'address']
-                    dfTarget.at[0, 'sCity'] = dfTemp.at[i, 'city']
-                    dfTarget.at[0, 'sState'] = dfTemp.at[i, 'state']
-                    dfTarget.at[0, 'sZip'] = dfTemp.at[i, 'zip']
-                    dfTarget.at[0, 'mCompany'] = dfTemp.at[i, 'company.1']
-                    dfTarget.at[0, 'mContact'] = dfTemp.at[i, 'contact.1']
-                    dfTarget.at[0, 'mAddress'] = dfTemp.at[i, 'address.1']
-                    dfTarget.at[0, 'mCity'] = dfTemp.at[i, 'city.1']
-                    dfTarget.at[0, 'mState'] = dfTemp.at[i, 'state.1']
-                    dfTarget.at[0, 'mZip'] = dfTemp.at[i, 'zip.1']
-                    maskAddr = dfTemp['address.1'] == dfTemp.at[i, 'address.1']
+                    dfTarget.at[0, 'utility'] = dfTemp.at[j, 'municipality']
+                    dfTarget.at[0, 'sId'] = dfTemp.at[j, 'siteid']
+                    dfTarget.at[0, 'sCompany'] = dfTemp.at[j, 'company']
+                    dfTarget.at[0, 'sAddress'] = dfTemp.at[j, 'address']
+                    dfTarget.at[0, 'sCity'] = dfTemp.at[j, 'city']
+                    dfTarget.at[0, 'sState'] = dfTemp.at[j, 'state']
+                    dfTarget.at[0, 'sZip'] = dfTemp.at[j, 'zip']
+                    dfTarget.at[0, 'mCompany'] = dfTemp.at[j, 'company.1']
+                    dfTarget.at[0, 'mContact'] = dfTemp.at[j, 'contact.1']
+                    dfTarget.at[0, 'mAddress'] = dfTemp.at[j, 'address.1']
+                    dfTarget.at[0, 'mCity'] = dfTemp.at[j, 'city.1']
+                    dfTarget.at[0, 'mState'] = dfTemp.at[j, 'state.1']
+                    dfTarget.at[0, 'mZip'] = dfTemp.at[j, 'zip.1']
+                    maskAddr = dfTemp['address.1'] == dfTemp.at[j, 'address.1']
                     dfTempTrimmed = dfTemp[maskAddr]
                     for i in dfTempTrimmed.index :
                         ci = 16
