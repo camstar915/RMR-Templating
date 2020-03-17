@@ -27,6 +27,7 @@ def run() :
     df1 = df1[~df1.municipality.str.contains("Sample")]
     df1 = df1[~df1.municipality.str.contains("Demo")]
     df1 = df1[~df1.municipality.str.contains("NOT UTILITY")]
+    df1 = df1[~df1.municipality.str.contains("Available")]
     df1.reset_index(drop=True, inplace=True)
 
     dfSendSite = df1[df1['sendnotices']]
