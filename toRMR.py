@@ -24,6 +24,11 @@ def run() :
     userCheck = []
     userCheckSIDs = []
 
+    df1 = df1[~df1.municipality.str.contains("Sample")]
+    df1 = df1[~df1.municipality.str.contains("Demo")]
+    df1 = df1[~df1.municipality.str.contains("NOT UTILITY")]
+    df1.reset_index(drop=True, inplace=True)
+
     dfSendSite = df1[df1['sendnotices']]
     for i in dfSendSite.index :
         if (dfSendSite.at[i, 'siteid'] in dfFinal['sId'].values) :
@@ -102,6 +107,43 @@ def run() :
                     dfFinal = dfFinal.append(dfTarget, ignore_index = True)
                     print('Added letter going to mailing address: ' + str(dfTarget.at[0, 'mAddress']))
                     dfTarget.drop(dfTarget.index[0], inplace = True)
+    mask1 = df1['sendnotices'] == False
+    mask2 = df1['sendnotices.1'] == False
+    dfBothZero = df1[mask1 & mask2]
+    for i in dfBothZero.index :
+        if (dfBothZero.at[i, 'siteid'] in dfFinal['sId'].values) :
+            continue
+        else :
+            dfTarget.loc[0, 'utility'] = dfBothZero.loc[i, 'municipality']
+            dfTarget.loc[0, 'sId'] = dfBothZero.loc[i, 'siteid']
+            dfTarget.loc[0, ['sCompany', 'mCompany']] = dfBothZero.loc[i, 'company']
+            dfTarget.loc[0, 'mContact'] = dfBothZero.loc[i, 'contact']
+            dfTarget.loc[0, ['sAddress', 'mAddress']] = dfBothZero.loc[i, 'address']
+            dfTarget.loc[0, ['sCity', 'mCity']] = dfBothZero.loc[i, 'city']
+            dfTarget.loc[0, ['sState', 'mState']] = dfBothZero.loc[i, 'state']
+            dfTarget.loc[0, ['sZip', 'mZip']] = dfBothZero.loc[i, 'zip']
+            dfTemp = dfBothZero[dfBothZero['siteid'] == dfBothZero.at[i, 'siteid']]
+            dfTempTrimmed = dfTemp.drop_duplicates('hazid')
+            for i in dfTempTrimmed.index :
+                ci = 16
+                while ci < 100000 :
+                    if (np.isnan(dfTarget.at[0, dfTarget.columns[ci]])) :
+                        dfTarget.at[0, dfTarget.columns[ci]] = dfTempTrimmed.at[i, 'hazid']
+                        dfTarget.at[0, dfTarget.columns[ci + 1]] = dfTempTrimmed.at[i, 'testdue']
+                        dfTarget.at[0, dfTarget.columns[ci + 2]] = dfTempTrimmed.at[i, 'devsize']
+                        dfTarget.at[0, dfTarget.columns[ci + 3]] = dfTempTrimmed.at[i, 'model']
+                        dfTarget.at[0, dfTarget.columns[ci + 4]] = dfTempTrimmed.at[i, 'serialnum']
+                        dfTarget.at[0, dfTarget.columns[ci + 5]] = dfTempTrimmed.at[i, 'hazardcat']
+                        dfTarget.at[0, dfTarget.columns[ci + 6]] = dfTempTrimmed.at[i, 'location']
+                        dfTarget.at[0, dfTarget.columns[ci + 7]] = dfTempTrimmed.at[i, 'lasttestcompany']
+                        dfTarget.at[0, dfTarget.columns[ci + 8]] = dfTempTrimmed.at[i, 'lasttestcompanyphone']
+                        ci += 1000000
+                    else :
+                        ci += 9
+            dfTarget.at[0, 'utility'] = dfBothZero.at[i, 'municipality']
+            dfFinal = dfFinal.append(dfTarget, ignore_index = True)
+            print('\'sendnotice\' field was 0 for both site and hazard. Added letter going to site: ' + str(dfTarget.at[0, 'sId']))
+            dfTarget.drop(dfTarget.index[0], inplace = True)
     for i in dfFinal.index :
         if dfFinal.at[i, 'utility'].startswith('Archon') :
             dfFinal.at[i, 'billing'] = 'Archon'
