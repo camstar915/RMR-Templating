@@ -48,7 +48,7 @@ def run() :
             dfTarget.loc[0, ['sZip', 'mZip']] = dfSendSite.loc[i, 'zip']
             dfTemp = dfSendSite[dfSendSite['siteid'] == dfSendSite.at[i, 'siteid']]
             dfTempTrimmed = dfTemp.drop_duplicates('hazid')
-            if (len(dfTempTrimmed) > 35) :
+            if (len(dfTempTrimmed) > 20) :
                 if (dfTempTrimmed.at[i, 'siteid'] not in tooManyHazards) :
                     print('Site ' + str(dfTempTrimmed.at[i, 'siteid']) + ' had too many hazards to fit on one page')
                     tooManyHazards.append(dfTempTrimmed.at[i, 'siteid'])
@@ -97,7 +97,7 @@ def run() :
                     dfTarget.at[0, 'mZip'] = dfTemp.at[j, 'zip.1']
                     maskAddr = dfTemp['address.1'] == dfTemp.at[j, 'address.1']
                     dfTempTrimmed = dfTemp[maskAddr]
-                    if (len(dfTempTrimmed) > 35) :
+                    if (len(dfTempTrimmed) > 20) :
                         if (dfTempTrimmed.at[i, 'siteid'] not in tooManyHazards) :
                             print('Site ' + str(dfTempTrimmed.at[i, 'siteid']) + ' had too many hazards to fit on one page')
                             tooManyHazards.append(dfTempTrimmed.at[i, 'siteid'])
@@ -138,7 +138,7 @@ def run() :
             dfTarget.loc[0, ['sZip', 'mZip']] = dfBothZero.loc[i, 'zip']
             dfTemp = dfBothZero[dfBothZero['siteid'] == dfBothZero.at[i, 'siteid']]
             dfTempTrimmed = dfTemp.drop_duplicates('hazid')
-            if (len(dfTempTrimmed) > 35) :
+            if (len(dfTempTrimmed) > 20) :
                 if (dfTempTrimmed.at[i, 'siteid'] not in tooManyHazards) :
                     print('Site ' + str(dfTempTrimmed.at[i, 'siteid']) + ' had too many hazards to fit on one page')
                     tooManyHazards.append(dfTempTrimmed.at[i, 'siteid'])
