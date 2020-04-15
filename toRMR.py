@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 def run() :
-    df = pd.read_csv("tmbExport.csv")
+    df = pd.read_csv("RMR_T2_Source_Doc.csv")
     print('CSV retrieved.')
     df1 = df.sort_values(['siteid'])
     print('Values sorted by siteid')
@@ -24,13 +24,15 @@ def run() :
     userCheck = []
     userCheckSIDs = []
     tooManyHazards = []
+    misplacedEmails = []
+    misplacedEmailsIndex = []
 
     print('Deleting non-real utilities')
     df1 = df1[~df1.municipality.str.contains("Sample")]
     df1 = df1[~df1.municipality.str.contains("Demo")]
     df1 = df1[~df1.municipality.str.contains("NOT UTILITY")]
     df1 = df1[~df1.municipality.str.contains("Available")]
-    df1 = df1[~df1['address.1'].str.contains("@", na=False)]
+    # df1 = df1[~df1['address.1'].str.contains("@", na=False)]
     df1.reset_index(drop=True, inplace=True)
 
     dfSendSite = df1[df1['sendnotices']]
@@ -164,6 +166,16 @@ def run() :
                 print('\'sendnotice\' field was 0 for both site and hazard. Added letter going to site: ' + str(dfTarget.at[0, 'sId']))
                 dfTarget.drop(dfTarget.index[0], inplace = True)
     for i in dfFinal.index :
+        mAddress = dfFinal.at[i, 'mAddress']
+        mContact = str(dfFinal.at[i, 'mContact'])
+        siteid = dfFinal.at[i, 'sId']
+        if '@' in mContact or '@' in mAddress:
+            if not siteid in misplacedEmails :
+                misplacedEmails.append(siteid)
+                misplacedEmailsIndex.append(i)
+    dfFinal.drop(index = misplacedEmailsIndex, inplace = True)
+    dfFinal.reset_index(drop = True, inplace = True)
+    for i in dfFinal.index :
         if dfFinal.at[i, 'utility'].startswith('Archon') :
             dfFinal.at[i, 'billing'] = 'Archon'
         else :
@@ -215,6 +227,9 @@ def run() :
     print('\nThe following sites had too many hazards to send to RMR:')
     for site in tooManyHazards :
         print(site)
+    print('\nThe following sites had misplaced email addresses, and had to be removed from the mailing:')
+    for i in misplacedEmails :
+        print(str(i) + ' ', end = '')
     print('\nHave a wonderful day!')
 
 print(' ')
