@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 def run() :
-    df = pd.read_csv("RMR_T2_Source_Doc.csv")
+    df = pd.read_csv("2020.05.21T1.csv")
     print('CSV retrieved.')
     df1 = df.sort_values(['siteid'])
     print('Values sorted by siteid')
@@ -28,10 +28,10 @@ def run() :
     misplacedEmailsIndex = []
 
     print('Deleting non-real utilities')
-    df1 = df1[~df1.municipality.str.contains("Sample")]
-    df1 = df1[~df1.municipality.str.contains("Demo")]
-    df1 = df1[~df1.municipality.str.contains("NOT UTILITY")]
-    df1 = df1[~df1.municipality.str.contains("Available")]
+    df1 = df1[~df1.municipality.str.contains("Sample", na=False)]
+    df1 = df1[~df1.municipality.str.contains("Demo", na=False)]
+    df1 = df1[~df1.municipality.str.contains("NOT UTILITY", na=False)]
+    df1 = df1[~df1.municipality.str.contains("Available", na=False)]
     # df1 = df1[~df1['address.1'].str.contains("@", na=False)]
     df1.reset_index(drop=True, inplace=True)
 
@@ -51,9 +51,14 @@ def run() :
             dfTemp = dfSendSite[dfSendSite['siteid'] == dfSendSite.at[i, 'siteid']]
             dfTempTrimmed = dfTemp.drop_duplicates('hazid')
             if (len(dfTempTrimmed) > 20) :
-                if (dfTempTrimmed.at[i, 'siteid'] not in tooManyHazards) :
-                    print('Site ' + str(dfTempTrimmed.at[i, 'siteid']) + ' had too many hazards to fit on one page')
-                    tooManyHazards.append(dfTempTrimmed.at[i, 'siteid'])
+                pd.set_option('display.max_rows', None)
+                # print(dfTemp)
+                # if (dfTempTrimmed.at[i, 'siteid'] not in tooManyHazards) :
+                #     print('Site ' + str(dfTempTrimmed.at[i, 'siteid']) + ' had too many hazards to fit on one page')
+                #     tooManyHazards.append(dfTempTrimmed.at[i, 'siteid'])
+                if (dfTempTrimmed['siteid'].iloc[0] not in tooManyHazards) :
+                    print('Site ' + str(dfTempTrimmed['siteid'].iloc[0]) + ' had too many hazards to fit on one page')
+                    tooManyHazards.append(dfTempTrimmed['siteid'].iloc[0])
             else :
                 for i in dfTempTrimmed.index :
                     ci = 16
