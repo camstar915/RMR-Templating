@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 def run() :
-    df = pd.read_csv("2020.05.21T1.csv")
+    df = pd.read_csv("6.19T1.csv")
     print('CSV retrieved.')
     df1 = df.sort_values(['siteid'])
     print('Values sorted by siteid')
@@ -19,7 +19,7 @@ def run() :
     dfFinal = pd.DataFrame(columns = targetColumns)
     print('Structured intermediary target dataframe')
     print('Structured final dataframe')
-    utilityEnv = ['Archon', 'Barrington', 'Carson City', 'Cedar Falls', 'Elk Grove', 'Johnstown', 'Kewanee', 'Lawrence', 'Marion Utilities', 'Mill Creek', 'New Braunfels', 'Owensboro', 'Prosser', 'Richton Park', 'Signal Hill']
+    utilityEnv = ['Archon', 'Barrington', 'Carson City', 'Cedar Falls', 'Elk Grove', 'Johnstown', 'Lawrence', 'Marion Utilities', 'Mill Creek', 'New Braunfels', 'Owensboro', 'Prosser', 'Richton Park', 'Signal Hill']
     print('Got list of cities that supply their own envelopes')
     userCheck = []
     userCheckSIDs = []
