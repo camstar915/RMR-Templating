@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 def run() :
-    df = pd.read_csv("6.19T1.csv")
+    df = pd.read_csv("2020.07.16 T1's.csv", encoding='cp1252')
     print('CSV retrieved.')
     df1 = df.sort_values(['siteid'])
     print('Values sorted by siteid')
@@ -105,7 +105,7 @@ def run() :
                     maskAddr = dfTemp['address.1'] == dfTemp.at[j, 'address.1']
                     dfTempTrimmed = dfTemp[maskAddr]
                     if (len(dfTempTrimmed) > 20) :
-                        if (dfTempTrimmed.at[i, 'siteid'] not in tooManyHazards) :
+                        if (dfTempTrimmed.at[j, 'siteid'] not in tooManyHazards) :
                             print('Site ' + str(dfTempTrimmed.at[i, 'siteid']) + ' had too many hazards to fit on one page')
                             tooManyHazards.append(dfTempTrimmed.at[i, 'siteid'])
                     else :
