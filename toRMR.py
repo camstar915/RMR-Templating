@@ -24,7 +24,7 @@ def run() :
     dfFinal = pd.DataFrame(columns = targetColumns)
     print('Structured intermediary target dataframe')
     print('Structured final dataframe')
-    utilityEnv = ['Archon', 'Barrington', 'Carson City', 'Cedar Falls', 'Elk Grove', 'Johnstown', 'Lawrence', 'Marion Utilities', 'Mill Creek', 'New Braunfels', 'Owensboro', 'Prosser', 'Richton Park', 'Signal Hill']
+    utilityEnv = ['Archon', 'Barrington', 'Carson City', 'Cedar Falls', 'Elk Grove', 'Hanover Park', 'Johnstown', 'Lawrence', 'Marion Utilities', 'Milan', 'Mill Creek', 'Morrison', 'New Braunfels', 'Owensboro', 'Prosser', 'Richton Park', 'Signal Hill', 'Streamwood', 'TRI-GID', 'Tuscarawas', 'Wheeling']
     print('Got list of cities that supply their own envelopes')
     userCheck = []
     userCheckSIDs = []
