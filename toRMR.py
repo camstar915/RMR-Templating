@@ -3,9 +3,13 @@ import numpy as np
 import time
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+import tkinter as tk
+from tkinter.filedialog import askopenfilename, asksaveasfilename
+import pkg_resources.py2_warn
 
 def run() :
-    df = pd.read_csv("6.19T1.csv")
+    update_label_text('Processing...')
+    df = pd.read_csv(target_file)
     print('CSV retrieved.')
     df1 = df.sort_values(['siteid'])
     print('Values sorted by siteid')
@@ -16,6 +20,7 @@ def run() :
     print('Changed sendnotice rows to booleans')
     targetColumns = ["utility", "billing", "notice", "envelope", "sId", "sCompany", "sAddress", "sCity", "sState", "sZip", "mCompany", "mContact", "mAddress", "mCity", "mState", "mZip", "hId1", "due1", "size1", "model1", "serial1", "cat1", "loc1", "testCompany1", "testCompanyPhone1", "hId2", "due2", "size2", "model2", "serial2", "cat2", "loc2", "testCompany2", "testCompanyPhone2", "hId3", "due3", "size3", "model3", "serial3", "cat3", "loc3", "testCompany3", "testCompanyPhone3", "hId4", "due4", "size4", "model4", "serial4", "cat4", "loc4", "testCompany4", "testCompanyPhone4", "hId5", "due5", "size5", "model5", "serial5", "cat5", "loc5", "testCompany5", "testCompanyPhone5", "hId6", "due6", "size6", "model6", "serial6", "cat6", "loc6", "testCompany6", "testCompanyPhone6", "hId7", "due7", "size7", "model7", "serial7", "cat7", "loc7", "testCompany7", "testCompanyPhone7", "hId8", "due8", "size8", "model8", "serial8", "cat8", "loc8", "testCompany8", "testCompanyPhone8", "hId9", "due9", "size9", "model9", "serial9", "cat9", "loc9", "testCompany9", "testCompanyPhone9", "hId10", "due10", "size10", "model10", "serial10", "cat10", "loc10", "testCompany10", "testCompanyPhone10", "hId11", "due11", "size11", "model11", "serial11", "cat11", "loc11", "testCompany11", "testCompanyPhone11", "hId12", "due12", "size12", "model12", "serial12", "cat12", "loc12", "testCompany12", "testCompanyPhone12", "hId13", "due13", "size13", "model13", "serial13", "cat13", "loc13", "testCompany13", "testCompanyPhone13", "hId14", "due14", "size14", "model14", "serial14", "cat14", "loc14", "testCompany14", "testCompanyPhone14", "hId15", "due15", "size15", "model15", "serial15", "cat15", "loc15", "testCompany15", "testCompanyPhone15", "hId16", "due16", "size16", "model16", "serial16", "cat16", "loc16", "testCompany16", "testCompanyPhone16", "hId17", "due17", "size17", "model17", "serial17", "cat17", "loc17", "testCompany17", "testCompanyPhone17", "hId18", "due18", "size18", "model18", "serial18", "cat18", "loc18", "testCompany18", "testCompanyPhone18", "hId19", "due19", "size19", "model19", "serial19", "cat19", "loc19", "testCompany19", "testCompanyPhone19", "hId20", "due20", "size20", "model20", "serial20", "cat20", "loc20", "testCompany20", "testCompanyPhone20", "hId21", "due21", "size21", "model21", "serial21", "cat21", "loc21", "testCompany21", "testCompanyPhone21", "hId22", "due22", "size22", "model22", "serial22", "cat22", "loc22", "testCompany22", "testCompanyPhone22", "hId23", "due23", "size23", "model23", "serial23", "cat23", "loc23", "testCompany23", "testCompanyPhone23", "hId24", "due24", "size24", "model24", "serial24", "cat24", "loc24", "testCompany24", "testCompanyPhone24", "hId25", "due25", "size25", "model25", "serial25", "cat25", "loc25", "testCompany25", "testCompanyPhone25", "hId26", "due26", "size26", "model26", "serial26", "cat26", "loc26", "testCompany26", "testCompanyPhone26", "hId27", "due27", "size27", "model27", "serial27", "cat27", "loc27", "testCompany27", "testCompanyPhone27", "hId28", "due28", "size28", "model28", "serial28", "cat28", "loc28", "testCompany28", "testCompanyPhone28", "hId29", "due29", "size29", "model29", "serial29", "cat29", "loc29", "testCompany29", "testCompanyPhone29", "hId30", "due30", "size30", "model30", "serial30", "cat30", "loc30", "testCompany30", "testCompanyPhone30", "hId31", "due31", "size31", "model31", "serial31", "cat31", "loc31", "testCompany31", "testCompanyPhone31", "hId32", "due32", "size32", "model32", "serial32", "cat32", "loc32", "testCompany32", "testCompanyPhone32", "hId33", "due33", "size33", "model33", "serial33", "cat33", "loc33", "testCompany33", "testCompanyPhone33", "hId34", "due34", "size34", "model34", "serial34", "cat34", "loc34", "testCompany34", "testCompanyPhone34", "hId35", "due35", "size35", "model35", "serial35", "cat35", "loc35", "testCompany35", "testCompanyPhone35"]
     dfTarget = pd.DataFrame(columns = targetColumns)
+    global dfFinal
     dfFinal = pd.DataFrame(columns = targetColumns)
     print('Structured intermediary target dataframe')
     print('Structured final dataframe')
@@ -192,8 +197,8 @@ def run() :
     print('Set billing to ABF or Archon')
     dfFinal.sort_values(['sId'], inplace=True)
     dfFinal.reset_index(drop=True, inplace=True)
-    print('Saving file...')
-    dfFinal.to_excel('output.xlsx')
+    # print('Saving file...')
+    # dfFinal.to_excel('output.xlsx')
     print(' ')
     print(' ')
     print(' ')
@@ -212,6 +217,7 @@ def run() :
                     if (fuzz.ratio(dfTrimmed.at[j, 'mCity'].lower(), dfTrimmed.at[x, 'mCity'].lower()) < 90) :
                         continue
                     elif not (dfTrimmed.at[j, 'sId'] in userCheckSIDs) :
+
                         userCheckSIDs.append(dfTrimmed.at[j, 'sId'])
                         userCheck.append({'sId':dfTrimmed.at[j, 'sId'], 'm1':dfTrimmed.at[j, 'mAddress'], 'm2':dfTrimmed.at[x, 'mAddress'], 'mC1':dfTrimmed.at[j, 'mCompany'], 'mC2':dfTrimmed.at[x, 'mCompany']})
                     x += 1
@@ -222,7 +228,9 @@ def run() :
     print(dash)
     print('\n\n')
     print('{:<10}{:<50}{:>40}'.format('Site ID', 'Mailing Addresses', 'Mailing Company')+'\n')
+    txt_result.insert(tk.END, 'The following addresses looked similar:\n')
     for item in userCheck :
+        txt_result.insert(tk.END, '{:<10}{:<50}{:>40}\n{:<10}{:<50}{:>40}'.format(item['sId'], item['m1'], item['mC1'], '', item['m2'], item['mC2'])+'\n')
         print('{:<10}{:<50}{:>40}'.format(item['sId'], item['m1'], item['mC1']))
         print('{:<10}{:<50}{:>40}'.format('', item['m2'], item['mC2'])+'\n')
     print(' ')
@@ -230,65 +238,79 @@ def run() :
     print(' ')
     print('Check these ^ sites for potential duplicate mailing addresses')
     print('\nThe following sites had too many hazards to send to RMR:')
+    txt_result.insert(tk.END, '\nThe following sites had too many hazards to send to RMR:\n')
     for site in tooManyHazards :
+        txt_result.insert(tk.END, str(site) + '\n')
         print(site)
     print('\nThe following sites had misplaced email addresses, and had to be removed from the mailing:')
+    txt_result.insert(tk.END, '\nThe following sites had misplaced email addresses, and had to be removed from the mailing:\n')
     for i in misplacedEmails :
+        txt_result.insert(tk.END, str(i) + '\n')
         print(str(i) + ' ', end = '')
     print('\nHave a wonderful day!')
+    update_label_text('Use Save As to save your output file')
+    btn_save['state'] = 'normal'
 
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print(' ')
-print('Before continuing:')
-print(' ')
-print('1. Save the file you\'d like to transform in the same folder as this program.')
-print('2. Name the file \"tmbExport\" and make sure it is a CSV')
-print('3. Make sure the file has the following column names')
-print(' ')
-print('municipality - siteid - company - contact - address - city - state - zip - sendnotices - company - contact - address - city - state - zip - sendnotices - hazid - testdue - devsize - model - serialnum - hazardcat - location - lasttestcompany - lasttestcompanyphone')
-print(' ')
-print(' ')
-x = input('Are you ready to continue? (y/n)')
-if x == 'n' or x == 'N' :
-    print('ok....')
-    time.sleep(3)
-    print(' ')
-    x1 = input('Now are you ready?... (y/n)')
-    if x1 == 'y' or x1 == 'Y' :
-        print('Finally...')
+def test_run() :
+    print('made it to test_run')
+    print(target_file)
+    global df
+    df = pd.read_csv(target_file)
+    print(df)
+    btn_save['state'] = 'normal'
+    update_label_text('Use Save As to save your output file')
+
+def open_file() :
+    global target_file
+    target_file = askopenfilename()
+    if not target_file :
+        return
+    btn_run['state'] = 'normal'
+    update_label_text('Click Run')
+    
+def save_file() :
+    global output_filename
+    output_filename = asksaveasfilename()
+    if not output_filename :
+        return
+    print(output_filename)
+    update_label_text('Saving...')
+    dfFinal.to_excel(output_filename + '.xlsx')
+    update_label_text('Saved!')
+
+def on_run_clicked() :
+    try:
         run()
-    else :
-        print('Well you can start this program again when you\'re ready. I\'m going back to sleep')
-        exit()
-elif x == 'y' or x == 'Y' :
-    print('Starting...')
-    run()
-else :
-    print(' ')
-    x1 = input('I SAID TO TYPE \'Y\' OR \'N\'! Try again...')
-    if x1 == 'y' or x1 == 'Y' :
-        print('That\'s better... Starting...')
-        run()
-    elif x1 == 'n' or x1 == 'N' :
-        print('Why\'d you even start the program then... I\'m leaving.')
-        exit()
-    else :
-        print('Well you let me know when you\'re ready to cooperate.')
-        exit()
+    except:
+        update_label_text('There was an error...')
+
+def update_label_text(txt) :
+    lbl_welcome.config(text=txt)
+
+window = tk.Tk()
+window.title('RMR - Templating')
+window.rowconfigure(0, minsize=100, weight=1)
+window.columnconfigure(1, minsize=400, weight=1)
+
+fr_buttons = tk.Frame(window, relief=tk.RAISED, bd=2)
+
+message = 'Hello!\nChoose a file to get started'
+
+lbl_welcome = tk.Label(text='Hello!\nChoose a file to get started')
+txt_result = tk.Text(width=100)
+btn_open = tk.Button(fr_buttons, text="Choose a File", command=open_file)
+btn_save = tk.Button(fr_buttons, text="Save As...", command=save_file)
+btn_run = tk.Button(fr_buttons, text="Run", command=on_run_clicked, bg="blue", fg="white")
+
+lbl_welcome.grid(row=0, column=1)
+txt_result.grid(row=1, column=1)
+btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+btn_run.grid(row=1, column=0, sticky="ew", padx=5)
+btn_save.grid(row=2, column=0, sticky="ew", padx=5, pady=5)
+
+fr_buttons.grid(row=0, column=0, sticky="ns")
+
+btn_save['state'] = 'disabled'
+btn_run['state'] = 'disabled'
+
+window.mainloop()
